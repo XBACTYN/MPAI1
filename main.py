@@ -21,13 +21,18 @@ path = json_data['source']
 img = imread(path)
 print('Image shape: ', img.shape)
 fig, ax = plt.subplots(2, 2)
+fig.tight_layout()
 fig2, bx = plt.subplots(2, 2)
+fig2.tight_layout()
+fig3, cx = plt.subplots(2, 2)
+fig3.tight_layout()
 img2 = img
 
 ax[0, 0].imshow(img, cmap=plt.cm.gray, vmin=0, vmax=255)
 ax[0, 0].set_title('Original')
 
 bx[0, 0].imshow(img, cmap=plt.cm.gray, vmin=0, vmax=255)
+cx[0, 0].imshow(img, cmap=plt.cm.gray, vmin=0, vmax=255)
 
 
 def build_histogram(image, n, m, xx):
@@ -40,7 +45,6 @@ def build_histogram(image, n, m, xx):
     print('max ', maximum)
     print('min ', minimum)
     xx[n, m].set_title("Brightness")
-    #return maximum, minimum, xx[n, m].hist(image.flatten(), bins=256, color='orange')
     return maximum, minimum, hist
 
 
@@ -80,6 +84,18 @@ def equalization(histo, image):
 def eq_pixel(image, F):
     return 255 * F[image]
 
+def thresholding(image):
+    f0 = 100 #for zelda
+    res_th = np.vectorize(threshold_pixel,excluded = [1])
+    img_thr = res_th(image,f0)
+    cx[0, 1].imshow(img_thr, cmap=plt.cm.gray)
+    return img_thr
+
+def threshold_pixel(image,f0):
+    if(image <= f0):
+        return 0
+    else:
+        return 255
 
 def all_show():
     plt.show()
@@ -92,6 +108,9 @@ def main():
     fmax, fmin, h22 = build_histogram(img, 1, 0, bx)
     eq_result = equalization(h22, img)
     fmax, fmin, h24 = build_histogram(eq_result.astype(np.uint8), 1, 1, bx)
+    fmax, fmin, h32 = build_histogram(img, 1, 0, cx)
+    th_result = thresholding(img)
+    fmax, fmin, h34 = build_histogram(th_result, 1, 1, cx)
     all_show()
 
 
